@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Jobs;
 
 public class Player : MonoBehaviour
 {
@@ -11,12 +12,27 @@ public class Player : MonoBehaviour
     public bool possoDarDisparoTriplo = false;
     public GameObject _disparoTriploPrefab;
 
+    public int vidas = 3;
+
+    private GerenciadorUI _uiGerenciador;
+
+    [SerializeField]
+    private GameObject _explosaoPlayerPrefab;
+
     // Start is called before the first frame update
     void Start()
     {
         Debug.Log("Metodo Start de "+this.name);
         _veloc = 8.0f;
-        transform.position = new Vector3(0.05045079f,-30.97f,0);   
+        transform.position = new Vector3(0.05045079f,-30.97f,0);
+
+        _uiGerenciador = GameObject.Find("Canvas").GetComponent<GerenciadorUI>();
+        if (_uiGerenciador != null)
+        {
+            _uiGerenciador.AtualizaVidas(vidas);
+
+        }
+
     }
 
     // Update is called once per frame
@@ -83,5 +99,19 @@ public class Player : MonoBehaviour
     public IEnumerator DisparoTriploRotina(){
         yield return new WaitForSeconds(7.0f);
         possoDarDisparoTriplo = false;
+    }
+    public void DanoAoPlayer()
+    {
+        //vidas = vidas - 1;
+        vidas--;
+
+        _uiGerenciador.AtualizaVidas(vidas);
+        
+        if ( vidas < 1)
+        {
+            Instantiate(_explosaoPlayerPrefab, transform.position, Quaternion.identity);
+            Destroy(this.gameObject);
+        }
+
     }
 }
